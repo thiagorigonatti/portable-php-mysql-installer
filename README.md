@@ -4,7 +4,7 @@ A script to install MySQL server portable
 ## This script will install MySQL8.0.29 in Windows operating system for you easy
 
 Make sure to download https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.29-winx64.zip from the oficial website
-and make sure to have downloaded `ini.my` file also
+and make sure to have downloaded `my.ini` file also
 
 ### This requires administrator permissions
 
