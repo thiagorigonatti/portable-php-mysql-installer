@@ -1,6 +1,8 @@
 # portable-mysql-installer-script
 A script to install MySQL server portable
 
+[![](https://img.shields.io/discord/677642178083946580?color=%23768ACF&label=Discord)](https://discord.gg/U8NcPcHxW3)
+
 ## This script will install MySQL8.0.29 in Windows operating system for you easy
 
 Make sure to download https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.29-winx64.zip from the oficial website
