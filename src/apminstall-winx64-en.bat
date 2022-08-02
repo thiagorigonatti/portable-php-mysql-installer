@@ -2918,11 +2918,11 @@ sc query %MySQLserviceName% > nul
 
 IF ERRORLEVEL 1060 (
     "C:\APMServer\MySQL-8.0.29\bin\mysqld" --install %MySQLserviceName% --defaults-file="C:\APMServer\MySQL-8.0.29\my.ini" > nul
-	echo Serviço %MySQLserviceName% instalado com sucesso.
+	echo Service %MySQLserviceName% installed successfully.
 
 ) else (
 	echo There is a service named %MySQLserviceName% already installed, please choose a new name for this new service to be installed.
-	set /p MySQLservice_name=Nome do serviço:
+	set /p MySQLservice_name=Service name:
 	set MySQLserviceName=!MySQLservice_name!
 	goto MySQLcheck_service
 )
