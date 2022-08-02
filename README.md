@@ -9,7 +9,7 @@ Make sure to download these 4 zipped files from the oficial websites here:
 
 [httpd-2.4.54-win64-VS16.zip](https://www.apachelounge.com/download/VS16/binaries/httpd-2.4.54-win64-VS16.zip)
 
-[php-8.1.8-Win32-vs16-x64.zip](https://windows.php.net/downloads/releases/php-8.1.8-Win32-vs16-x64.zip)
+[php-8.1.8-Win32-vs16-x64.zip](https://windows.php.net/downloads/releases/archives/php-8.1.8-Win32-vs16-x64.zip)
 
 [mysql-8.0.29-winx64.zip](https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.29-winx64.zip)
 
