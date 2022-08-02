@@ -1,25 +1,40 @@
 # portable-mysql-installer-script
-A script to install MySQL server portable
+A script to install a PHP server with MySQL database portable
 
 [![](https://img.shields.io/discord/677642178083946580?color=%23768ACF&label=Discord)](https://discord.gg/U8NcPcHxW3)
 
-## This script will install MySQL8.0.29 in Windows operating system for you easy
+## This script will install httpd-2.4.54-win64-VS16 (Apache), php-8.1.8-Win32-vs16-x64 (PHP), mysql-8.0.29-winx64 (MySQL Server) and phpMyAdmin-5.2.0-all-languages (Database Manager) in Windows operating system for you easy
 
-Make sure to download https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.29-winx64.zip from the oficial website
-and make sure to have downloaded `my.ini` file also
+Make sure to download these 4 zipped files from the oficial websites here:
+
+[httpd-2.4.54-win64-VS16.zip](https://www.apachelounge.com/download/VS16/binaries/httpd-2.4.54-win64-VS16.zip)
+
+[php-8.1.8-Win32-vs16-x64.zip](https://windows.php.net/downloads/releases/php-8.1.8-Win32-vs16-x64.zip)
+
+[mysql-8.0.29-winx64.zip](https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.29-winx64.zip)
+
+[phpMyAdmin-5.2.0-all-languages.zip](https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.zip)
+
 
 ### This requires administrator permissions
 
-Once running the script will:
+Once running, the script will:
 1. Check for administrator permissions
-2. Extract mysql-8.0.29-winx64.zip to C:\MySQL\
-3. Copy my.ini file to C:\MySQL\MySQL-8.0.29\
-4. Create uploads folder according to my.ini option
-5. Try to create a service named `MySQL80` if it already exists the script will prompt you to enter a name to a new service
-6. Config this service as manual initialization
-7. Create 2 files named start MySQL80.bat and stop MySQL80.bat to start and open MySQL80 later
-8. Initialize MySQL data folder insecure (with no pass for root user)
-9. Open MySQL in command prompt to be used
+2. Extract httpd-2.4.54-win64-VS16.zip to C:\APMServer\ (en) or C:\ServidorAPM\ (pt_BR)
+3. Apply the configuration for apache server
+4. Extract php-8.1.8-Win32-vs16-x64.zip to C:\APMServer\PHP-8.1.8\ (en) or C:\ServidorAPM\PHP-8.1.8 (pt_BR)
+5. Apply the configuration for PHP module
+6. Extract mysql-8.0.29-winx64.zip to C:\APMServer\MySQL-8.0.29\ (en) or C:\ServidorAPM\MySQL-8.0.29 (pt_BR)
+7. Apply the configuration for MySQL8.0 database
+8. Check if there is a service named `MySQL80` already installed, if so, you'll be prompted to enter a new name for this service to be installed
+9. Extract phpMyAdmin-5.2.0-all-languages.zip to C:\APMServer\Apache24\htdocs\phpmyadmin\ (en) or C:\ServidorAPM\Apache24\htdocs\phpmyadmin (pt_BR)
+10. Check if there is a service named `APMServer` already installed, if so, you'll be prompted to enter a new name for this service to be installed
+11. Extract data for MySQL and initialize it insecurely
+12. Set those 2 services `MySQL80` and `APMServer` as manually started
+13. Start the services
+14. Create 2 scripts on desktop to start and stop APMServer (the services)
+15. Create a shortcut on desktop for ApacheMonitor.exe
+16. Open MySQL in command prompt to be used
 
 Then you can change your root password by typing this on MySQL server
 
@@ -31,6 +46,6 @@ exit;
 
 Note: If you put a password for root you need to change start MySQL80.bat file as the following:
 
-`C:\MySQL\MySQL-8.0.29\bin\mysql.exe -u root`
+`"C:\APMServer\MySQL-8.0.29\bin\mysql.exe" -u root`
 to
-`C:\MySQL\MySQL-8.0.29\bin\mysql.exe -u root -p YourNewPassword`
+`"C:\APMServer\MySQL-8.0.29\bin\mysql.exe" -u root -p`
