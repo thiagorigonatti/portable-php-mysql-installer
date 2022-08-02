@@ -44,7 +44,7 @@ flush privileges;
 exit;
 ```
 
-Note: If you put a password for root you need to change start MySQL80.bat file as the following:
+Note: If you put a password for root you need to change `Start APMServer.bat` file as the following:
 
 `"C:\APMServer\MySQL-8.0.29\bin\mysql.exe" -u root`
 to
