@@ -3,7 +3,7 @@ A script to install a PHP server with MySQL database portable
 
 [![](https://img.shields.io/discord/677642178083946580?color=%23768ACF&label=Discord)](https://discord.gg/U8NcPcHxW3)
 
-## This script will install httpd-2.4.54-win64-VS16 (Apache), php-8.1.8-Win32-vs16-x64 (PHP), mysql-8.0.29-winx64 (MySQL Server) and phpMyAdmin-5.2.0-all-languages (Database Manager) in Windows operating system for you easy
+## This script will install httpd-2.4.54-win64-VS16 (Apache), php-8.1.8-Win32-vs16-x64 (PHP), mysql-8.0.30-winx64 (MySQL Server) and phpMyAdmin-5.2.0-all-languages (Database Manager) in Windows operating system for you easy
 
 Make sure to download these 4 zipped files from the oficial websites here:
 
@@ -11,7 +11,7 @@ Make sure to download these 4 zipped files from the oficial websites here:
 
 [php-8.1.8-Win32-vs16-x64.zip](https://windows.php.net/downloads/releases/archives/php-8.1.8-Win32-vs16-x64.zip)
 
-[mysql-8.0.29-winx64.zip](https://downloads.mysql.com/archives/get/p/23/file/mysql-8.0.29-winx64.zip)
+[mysql-8.0.30-winx64.zip](https://dev.mysql.com/get/Downloads/MySQL-8.0/mysql-8.0.30-winx64.zip)
 
 [phpMyAdmin-5.2.0-all-languages.zip](https://files.phpmyadmin.net/phpMyAdmin/5.2.0/phpMyAdmin-5.2.0-all-languages.zip)
 
@@ -24,7 +24,7 @@ Once running, the script will:
 3. Apply the configuration for apache server
 4. Extract php-8.1.8-Win32-vs16-x64.zip to C:\APMServer\PHP-8.1.8\ (en) or C:\ServidorAPM\PHP-8.1.8 (pt_BR)
 5. Apply the configuration for PHP module
-6. Extract mysql-8.0.29-winx64.zip to C:\APMServer\MySQL-8.0.29\ (en) or C:\ServidorAPM\MySQL-8.0.29 (pt_BR)
+6. Extract mysql-8.0.30-winx64.zip to C:\APMServer\MySQL-8.0.30\ (en) or C:\ServidorAPM\MySQL-8.0.30 (pt_BR)
 7. Apply the configuration for MySQL8.0 database
 8. Check if there is a service named `MySQL80` already installed, if so, you'll be prompted to enter a new name for this service to be installed
 9. Extract phpMyAdmin-5.2.0-all-languages.zip to C:\APMServer\Apache24\htdocs\phpmyadmin\ (en) or C:\ServidorAPM\Apache24\htdocs\phpmyadmin (pt_BR)
@@ -46,6 +46,6 @@ exit;
 
 Note: If you put a password for root you need to change `Start APMServer.bat` file as the following:
 
-`"C:\APMServer\MySQL-8.0.29\bin\mysql.exe" -u root`
+`"C:\APMServer\MySQL-8.0.30\bin\mysql.exe" -u root`
 to
-`"C:\APMServer\MySQL-8.0.29\bin\mysql.exe" -u root -p`
+`"C:\APMServer\MySQL-8.0.30\bin\mysql.exe" -u root -p`
