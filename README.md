@@ -5,7 +5,7 @@ A script to install a PHP server with MySQL database portable
 
 ## This script will install httpd-2.4.54-win64-VS16 (Apache), php-8.1.8-Win32-vs16-x64 (PHP), mysql-8.0.30-winx64 (MySQL Server) and phpMyAdmin-5.2.0-all-languages (Database Manager) in Windows operating system for you easy
 
-Be sure you installed latest 14.32.31332 Visual C++ Redistributable Visual Studio 2015-2022 : [vc_redist_x64](https://aka.ms/vs/17/release/VC_redist.x64.exe) or [vc_redist_x86](https://aka.ms/vs/17/release/VC_redist.x86.exe)
+Be sure you installed latest 14.32.31332 Visual C++ Redistributable Visual Studio 2015-2022 : [vc_redist_x64](https://aka.ms/vs/17/release/VC_redist.x64.exe)
 
 Make sure to download these 4 zipped files from the oficial websites here:
 
