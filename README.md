@@ -3,6 +3,7 @@ A script to install a PHP server with MySQL database portable
 
 [![](https://img.shields.io/discord/677642178083946580?color=%23768ACF&label=Discord)](https://discord.gg/U8NcPcHxW3) [![Twitch Status](https://img.shields.io/twitch/status/thiagorigonatti?label=Twitch)](https://twitch.tv/thiagorigonatti)
 [![YouTube Channel Subscribers](https://img.shields.io/youtube/channel/subscribers/UCEDjQf5cEkH4320GevAitUA?label=Thiago%20Rigonatti)](https://www.youtube.com/thiagorigonatti)
+[![](https://img.shields.io/badge/Linked-In-blue)](https://www.linkedin.com/in/thiagorigonatti/)
 
 ## This script will install httpd-2.4.54-win64-VS16 (Apache), php-8.1.8-Win32-vs16-x64 (PHP), mysql-8.0.30-winx64 (MySQL Server) and phpMyAdmin-5.2.0-all-languages (Database Manager) in Windows operating system for you easy
 
