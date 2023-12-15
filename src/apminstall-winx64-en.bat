@@ -1,6 +1,27 @@
 @echo off
+Rem turns echo off
+
+Rem changes code page to UTF-8
 chcp 65001 > nul
+
+Rem enables expansion
+setlocal enabledelayedexpansion
+
+Rem checks for administrator permissions
+net session >nul 2>&1
+    if %errorLevel% == 0 (
+        echo Installing Apache httpd... PLEASE WAIT
+        timeout /t 2 /nobreak > NUL
+    ) else (
+        echo Failure: Administrator permissions is required to run; run it as an administrator.
+		pause
+		exit
+    )
+
+Rem navigates to this script location
 cd /d %~dp0
+
+Rem checks if all files and dependencies exist
 if not exist "C:\Windows\System32\vcruntime140.dll" (
 	echo vcruntime140.dll not found, please install VC_redist.x64.exe 2015 - 2022 library
 	pause
@@ -9,8 +30,8 @@ if not exist "C:\Windows\System32\vcruntime140.dll" (
 	echo vcruntime140_1.dll not found, please install VC_redist.x64.exe 2015 - 2022 library
 	pause
 	exit
-)else if not exist "%~dp0\httpd-2.4.57-win64-VS17.zip" (
-	echo httpd-2.4.57-win64-VS17.zip not found
+)else if not exist "%~dp0\httpd-2.4.58-win64-VS17.zip" (
+	echo httpd-2.4.58-win64-VS17.zip not found
 	pause
 	exit
 )else if not exist "%~dp0\php-8.2.6-Win32-vs16-x64.zip" (
@@ -26,21 +47,16 @@ if not exist "C:\Windows\System32\vcruntime140.dll" (
 	pause
 	exit
 	)
-)
-setlocal enabledelayedexpansion
-net session >nul 2>&1
-    if %errorLevel% == 0 (
-        echo Installing Apache httpd... PLEASE WAIT
-        timeout /t 2 /nobreak > NUL
-    ) else (
-        echo Failure: Administrator permissions is required to run; run it as an administrator.
-		pause
-		exit
-    )
+
+Rem creates root directory for install files
 if not exist "C:\APMServer\" mkdir "C:\APMServer\"
-tar -xvf "%~dp0/httpd-2.4.57-win64-VS17.zip" -C "C:/APMServer/"
+
+Rem extracts httpd to root directory
+tar -xvf "%~dp0/httpd-2.4.58-win64-VS17.zip" -C "C:/APMServer/"
 echo Configuring Apache httpd... PLEASE WAIT
 set blank=
+
+Rem configures file http.conf
 echo #> "C:\APMServer\Apache24\conf\httpd.conf"
 echo # This is the main Apache HTTP server configuration file.  It contains the>> "C:\APMServer\Apache24\conf\httpd.conf"
 echo # configuration directives that give the server its instructions.>> "C:\APMServer\Apache24\conf\httpd.conf"
@@ -584,7 +600,11 @@ echo AddType text/html .php>> "C:\APMServer\Apache24\conf\httpd.conf"
 echo HeaderName "/apmserver/header.php">> "C:\APMServer\Apache24\conf\httpd.conf"
 echo ReadmeName "/apmserver/footer.php">> "C:\APMServer\Apache24\conf\httpd.conf"
 echo.%blank%>> "C:\APMServer\Apache24\conf\httpd.conf"
-for /f "delims=[] tokens=2" %%a in ('ping -4 -n 1 %ComputerName% ^| findstr [') do set ipv4=%%a
+
+Rem obtain devices's ipv4
+for /f "tokens=3 delims=: " %%a  in ('netsh interface ip show config name^="Ethernet" ^| findstr "IP Address"') do set ipv4=%%a
+
+Rem configures file httpd-vhosts.conf
 echo # Virtual Hosts> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 echo #>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 echo # Required modules: mod_log_config>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
@@ -637,6 +657,8 @@ echo     CustomLog "logs/mywebsite.com-access.log" common>> "C:\APMServer\Apache
 echo     DirectoryIndex index.php>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 echo ^</VirtualHost^>>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 echo.%blank%>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
+
+Rem generates random char sequence to create host backup folder
 Set _RNDLength=8
 Set _Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
 Set _Str=%_Alphanumeric%987654321
@@ -654,22 +676,35 @@ SET _RndAlphaNum=!_RndAlphaNum!!_Alphanumeric:~%_RND%,1!
 If !_count! lss %_RNDLength% goto _loop
 if not exist "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\" mkdir "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\"
 if exist "C:\Windows\System32\drivers\etc\hosts" move /Y "C:\Windows\System32\drivers\etc\hosts" "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\"
-echo.%blank%> "C:\Windows\System32\drivers\etc\hosts"
-echo 127.0.0.1 apmserver.com>> "C:\Windows\System32\drivers\etc\hosts"
+
+timeout /t 2 /nobreak > NUL
+
+echo 127.0.0.1 apmserver.com> "C:\Windows\System32\drivers\etc\hosts"
 echo 127.0.0.1 www.apmserver.com>> "C:\Windows\System32\drivers\etc\hosts"
-echo.%blank%>> "C:\Windows\System32\drivers\etc\hosts"
 echo 127.0.0.2 db.apmserver.com>> "C:\Windows\System32\drivers\etc\hosts"
 echo 127.0.0.2 www.db.apmserver.com>> "C:\Windows\System32\drivers\etc\hosts"
-echo.%blank%>> "C:\Windows\System32\drivers\etc\hosts"
 echo %ipv4% mywebsite.com>> "C:\Windows\System32\drivers\etc\hosts"
 echo %ipv4% www.mywebsite.com>> "C:\Windows\System32\drivers\etc\hosts"
-echo.%blank%>> "C:\Windows\System32\drivers\etc\hosts"
+
+Rem creates websites/server directories and deletes the default index.html file
 if not exist "C:\APMServer\Apache24\htdocs\mywebsite\" mkdir "C:\APMServer\Apache24\htdocs\mywebsite\"
 if not exist "C:\APMServer\Apache24\htdocs\apmserver\" mkdir "C:\APMServer\Apache24\htdocs\apmserver\"
 del "C:\APMServer\Apache24\htdocs\index.html"
+
+Rem moves favicon to server directory
+xcopy /s icons\favicon.ico C:\APMServer\Apache24\htdocs\
+
+
+Rem writes file header.php
 echo ^<?php>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
 echo ?^>>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
 echo ^<h3^>Listing^</h3^>>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
+echo ^<script^>>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
+echo const head = document.getElementsByTagName('head')[0]>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
+echo head.getElementsByTagName('title')[0].text = 'APM Server'>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
+echo ^</script^>>> "C:\APMServer\Apache24\htdocs\apmserver\header.php"
+
+Rem writes file footer.php
 echo ^<?php>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
 echo ?^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
 echo ^<h3^>My Projects^</h3^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
@@ -696,11 +731,18 @@ echo     ^<li^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
 echo         ^<a href="http://%ipv4%" target="_blank"^>%ipv4%^</a^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
 echo     ^</li^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
 echo ^</ul^>>> "C:\APMServer\Apache24\htdocs\apmserver\footer.php"
+
+
 echo Installing PHP... PLEASE WAIT
 timeout /t 2 /nobreak > NUL
+
 if not exist "C:\APMServer\PHP-8.2.6" mkdir "C:\APMServer\PHP-8.2.6"
+
+Rem extracts php to root directory
 tar -xvf "%~dp0/php-8.2.6-Win32-vs16-x64.zip" -C "C:/APMServer/PHP-8.2.6/"
 echo Configuring PHP... PLEASE WAIT
+
+Rem configures file php.ini
 echo [PHP]> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo.%blank%>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ;;;;;;;;;;;;;;;;;;;>> "C:\APMServer\PHP-8.2.6\php.ini-development"
@@ -1665,6 +1707,9 @@ echo ;extension=xsl>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ;extension=zip>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo.%blank%>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ;zend_extension=opcache>> "C:\APMServer\PHP-8.2.6\php.ini-development"
+
+echo zend_extension=php_xdebug-3.2.2-8.2-vs16-x86_64.dll>> "C:\APMServer\PHP-8.2.6\php.ini-development"
+
 echo.%blank%>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ;;;;;;;;;;;;;;;;;;;>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ; Module Settings ;>> "C:\APMServer\PHP-8.2.6\php.ini-development"
@@ -2676,13 +2721,23 @@ echo ;ffi.enable=preload>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo.%blank%>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ; List of headers files to preload, wildcard patterns allowed.>> "C:\APMServer\PHP-8.2.6\php.ini-development"
 echo ;ffi.preload=>> "C:\APMServer\PHP-8.2.6\php.ini-development"
+
+Rem copies xdebug extension to php's extension directory
+xcopy /s third-party-ext\xdebug\php_xdebug-3.2.2-8.2-vs16-x86_64.dll C:\APMServer\PHP-8.2.6\ext\
+
+
+Rem renames php.ini-development to php.ini
 rename "C:\APMServer\PHP-8.2.6\php.ini-development" php.ini > nul
+
+Rem extracts mysql to root directory
 echo Installing MySQL... PLEASE WAIT
 timeout /t 2 /nobreak > NUL
 tar -xvf "%~dp0/mysql-8.0.32-winx64.zip" -C "C:/APMServer/"
 echo Configuring MySQL... PLEASE WAIT
 rename "C:\APMServer\mysql-8.0.32-winx64" MySQL-8.0.32 > nul
 if not exist "C:\APMServer\MySQL-8.0.32\uploads" mkdir "C:\APMServer\MySQL-8.0.32\uploads"
+
+Rem configures file my.ini
 echo # Other default tuning values> "C:\APMServer\MySQL-8.0.32\my.ini"
 echo # MySQL Server Instance Configuration File>> "C:\APMServer\MySQL-8.0.32\my.ini"
 echo # ---------------------------------------------------------------------->> "C:\APMServer\MySQL-8.0.32\my.ini"
@@ -3028,6 +3083,8 @@ echo # plugin_load>> "C:\APMServer\MySQL-8.0.32\my.ini"
 echo.%blank%>> "C:\APMServer\MySQL-8.0.32\my.ini"
 echo # The TCP/IP Port the MySQL Server X Protocol will listen on.>> "C:\APMServer\MySQL-8.0.32\my.ini"
 echo loose_mysqlx_port=33060>> "C:\APMServer\MySQL-8.0.32\my.ini"
+
+Rem checks and install mysql service
 set MySQLserviceName=MySQL80
 :MySQLcheck_service
 sc query %MySQLserviceName% > nul
@@ -3040,12 +3097,16 @@ IF ERRORLEVEL 1060 (
 	set MySQLserviceName=!MySQLservice_name!
 	goto MySQLcheck_service
 )
+
+Rem extracts phpmyadmin to root directory
 echo Installing PhpMyAdmin... PLEASE WAIT
 timeout /t 2 /nobreak > NUL
 tar -xvf "%~dp0/phpMyAdmin-5.2.1-all-languages.zip" -C "C:/APMServer/Apache24/htdocs/"
 echo Configuring PhpMyAdmin... PLEASE WAIT
 rename "C:\APMServer\Apache24\htdocs\phpMyAdmin-5.2.1-all-languages" phpmyadmin > nul
 set secret=abcdefghijklmnopqrstuvwxyz012345
+
+Rem configures file config.sample.inc.php
 echo ^<?php> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo /^*^*>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* phpMyAdmin sample configuration, you can use it as base for>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
@@ -3061,7 +3122,7 @@ echo /^*^*>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* This is needed for cookie based authentication to encrypt the cookie.>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* Needs to be a 32-bytes long string of random bytes. See FAQ 2.10.>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^*/>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
-echo $cfg['blowfish_secret'] = '%secret%'; /^* YOU MUST FILL IN THIS FOR COOKIE AUTH! ^*/>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
+echo $cfg['blowfish_secret'] = '%secret%'; /^* YOU MUST FILL IN THIS FOR COOKIE AUTH^! ^*/>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo.%blank%>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo /^*^*>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* Servers configuration>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
@@ -3206,7 +3267,11 @@ echo /^*^*>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* You can find more configuration options in the documentation>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^* in the doc/ folder or at ^<https://docs.phpmyadmin.net/^>.>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
 echo  ^*/>> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
+
+Rem renames config.sample.inc.php to config.inc.php
 rename "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php" config.inc.php > nul
+
+Rem checks and install apache service
 set APMserviceName=APMServer
 :APMcheck_service
 sc query %APMserviceName% > nul
@@ -3219,9 +3284,12 @@ IF ERRORLEVEL 1060 (
 	set APMserviceName=!APMservice_name!
 	goto APMcheck_service
 )
+
 sc config %APMserviceName% start=demand > nul
 net start %APMserviceName% > nul
-echo Extracting data... PLEASE WAIT
+
+Rem creates file to start both services
+echo Extracting database... PLEASE WAIT
 "C:\APMServer\MySQL-8.0.32\bin\mysqld" --initialize-insecure
 sc config %MySQLserviceName% start=demand > nul
 net start %MySQLserviceName% > nul
@@ -3236,8 +3304,8 @@ echo echo Failure: Administrator permissions is required to run; run it as an ad
 echo pause >> "%homedrive%%homepath%\Desktop\Start %APMserviceName%.bat"
 echo exit >> "%homedrive%%homepath%\Desktop\Start %APMserviceName%.bat"
 echo ) >> "%homedrive%%homepath%\Desktop\Start %APMserviceName%.bat"
-echo cls >> "%homedrive%%homepath%\Desktop\Start %APMserviceName%.bat"
-echo "C:\APMServer\MySQL-8.0.32\bin\mysql.exe" -u root >> "%homedrive%%homepath%\Desktop\Start %APMserviceName%.bat"
+
+Rem creates file to stop both services
 echo @echo off > "%homedrive%%homepath%\Desktop\Stop %APMserviceName%.bat"
 echo chcp 65001 ^> nul >> "%homedrive%%homepath%\Desktop\Stop %APMserviceName%.bat"
 echo net session ^>nul 2^>^&1 >> "%homedrive%%homepath%\Desktop\Stop %APMserviceName%.bat"
@@ -3257,10 +3325,43 @@ echo oLink.TargetPath = "C:\APMServer\Apache24\bin\ApacheMonitor.exe" >> %SCRIPT
 echo oLink.Save >> %SCRIPT%
 cscript /nologo %SCRIPT%
 del %SCRIPT%
+
+Rem adds apachemonitos shortcut to auto initialized
+xcopy /s /y "%USERPROFILE%\Desktop\ApacheMonitor.lnk" "%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\"
+
+Rem adds uninstall file
+if not exist "C:\ProgramData\APMServer\" mkdir "C:\ProgramData\APMServer\"
+echo @echo off> C:\ProgramData\APMServer\uninstall.bat
+echo chcp 65001 ^> nul>> C:\ProgramData\APMServer\uninstall.bat
+echo net session ^>nul ^2^>^&^1>> C:\ProgramData\APMServer\uninstall.bat
+echo     if %%errorLevel%% == 0 (>> C:\ProgramData\APMServer\uninstall.bat
+echo         GOTO PROMPT>> C:\ProgramData\APMServer\uninstall.bat
+echo     ) else (>> C:\ProgramData\APMServer\uninstall.bat
+echo         echo Failure: Administrator permissions is required to run; run it as an administrator.>> C:\ProgramData\APMServer\uninstall.bat
+echo 		pause>> C:\ProgramData\APMServer\uninstall.bat
+echo 		exit>> C:\ProgramData\APMServer\uninstall.bat
+echo     )>> C:\ProgramData\APMServer\uninstall.bat
+echo setlocal>> C:\ProgramData\APMServer\uninstall.bat
+echo :PROMPT>> C:\ProgramData\APMServer\uninstall.bat
+echo SET /p AREYOUSURE=This will remove all APMServer directory content, are you sure (Y/[N])?>> C:\ProgramData\APMServer\uninstall.bat
+echo IF /I "%%AREYOUSURE%%" NEQ "Y" GOTO END>> C:\ProgramData\APMServer\uninstall.bat
+echo net stop %APMserviceName%>> C:\ProgramData\APMServer\uninstall.bat
+echo net stop %MySQLserviceName%>> C:\ProgramData\APMServer\uninstall.bat
+echo taskkill /F /IM ApacheMonitor.exe /T>> C:\ProgramData\APMServer\uninstall.bat
+echo sc delete %APMserviceName%>> C:\ProgramData\APMServer\uninstall.bat
+echo sc delete %MySQLserviceName%>> C:\ProgramData\APMServer\uninstall.bat
+echo del "%USERPROFILE%\Desktop\Stop APMServer.bat">> C:\ProgramData\APMServer\uninstall.bat
+echo del "%USERPROFILE%\Desktop\Start APMServer.bat">> C:\ProgramData\APMServer\uninstall.bat
+echo del "%USERPROFILE%\Desktop\ApacheMonitor.lnk">> C:\ProgramData\APMServer\uninstall.bat
+echo del "%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\ApacheMonitor.lnk">> C:\ProgramData\APMServer\uninstall.bat
+echo rmdir /s /q C:\APMServer\>> C:\ProgramData\APMServer\uninstall.bat
+echo :END>> C:\ProgramData\APMServer\uninstall.bat
+echo endlocal>> C:\ProgramData\APMServer\uninstall.bat
+
+Rem starts apache server and launch websites
 start /d "C:\APMServer\Apache24\bin\" ApacheMonitor.exe
 start "" "http://apmserver.com"
 start "" "http://db.apmserver.com"
 start "" "http://mywebsite.com"
-cls
-"C:\APMServer\MySQL-8.0.32\bin\mysql" -u root
+
 exit
