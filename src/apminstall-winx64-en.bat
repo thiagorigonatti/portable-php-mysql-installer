@@ -54,6 +54,7 @@ if not exist "C:\APMServer\" mkdir "C:\APMServer\"
 ::extracts httpd to root directory
 tar -xvf "%~dp0/files/httpd-2.4.63-250207-win64-VS17.zip" -C "C:/APMServer/"
 echo Configuring Apache httpd... PLEASE WAIT
+
 set blank=
 
 ::configures file http.conf
@@ -659,31 +660,18 @@ echo ^</VirtualHost^>>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 echo.%blank%>> "C:\APMServer\Apache24\conf\extra\httpd-vhosts.conf"
 
 ::generates random char sequence to create host backup folder
-set _RNDLength=16
-set _Alphanumeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-set _Str=%_Alphanumeric%987654321
-:_LenLoop
-if not "%_Str:~18%"=="" set _Str=%_Str:~9%& set /A _Len+=9& goto :_LenLoop
-set _tmp=%_Str:~9,1%
-set /A _Len=_Len+_tmp
-set _count=0
-set _RndAlphaNum=
-:_Loop
-set /a _count+=1
-set _RND=%Random%
-set /A _RND=_RND%%%_Len%
-set _RndAlphaNum=!_RndAlphaNum!!_Alphanumeric:~%_RND%,1!
-if !_count! lss %_RNDLength% goto _Loop
-if not exist "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\" mkdir "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\"
+set alpha_numeric=abcdefghijklmnopqrstuvwxyz0123456789
+set count=0
+set random_string=
 
-set "HOSTS_FILE=C:\Windows\System32\drivers\etc\hosts"
-
-powershell -Command ^
-    "$fs = [System.IO.File]::Open('%HOSTS_FILE%', 'Open', 'Read', 'ReadWrite');" ^
-    "$sr = New-Object System.IO.StreamReader($fs);" ^
-    "$content = $sr.ReadToEnd();" ^
-    "$sr.Close(); $fs.Close();" ^
-    "Write-Output $content" > "C:\Windows\System32\drivers\etc\backup\!_RndAlphaNum!\hosts"
+:loop
+set /a count+=1
+set rnd=%random%
+set /a rnd=rnd%%36
+set random_string=%random_string%!alpha_numeric:~%rnd%,1!
+if %count% lss 8 goto loop
+if not exist "C:\Windows\System32\drivers\etc\backup\%random_string%\" mkdir "C:\Windows\System32\drivers\etc\backup\%random_string%\"
+if exist "C:\Windows\System32\drivers\etc\hosts" copy "C:\Windows\System32\drivers\etc\hosts" "C:\Windows\System32\drivers\etc\backup\%random_string%\hosts"
 
 timeout /t 2 /nobreak > NUL
 
@@ -2822,7 +2810,7 @@ echo # The TCP/IP Port the MySQL Server will listen on>> "C:\APMServer\MySQL-8.4
 echo port=3306>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo.%blank%>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo # Path to installation directory. All paths are usually resolved relative to this.>> "C:\APMServer\MySQL-8.4.5\my.ini"
-echo # basedir="C:\APMServer\MySQL-8.4.5\">> "C:\APMServer\MySQL-8.4.5\my.ini"
+echo # basedir="C:/APMServer/MySQL-8.4.5/">> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo.%blank%>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo # Path to the database root>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo datadir=C:/APMServer/MySQL-8.4.5/data>> "C:\APMServer\MySQL-8.4.5\my.ini"
@@ -3061,7 +3049,6 @@ echo # Load mysql plugins at start."plugin_x ; plugin_y".>> "C:\APMServer\MySQL-
 echo # plugin_load>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo.%blank%>> "C:\APMServer\MySQL-8.4.5\my.ini"
 echo # The TCP/IP Port the MySQL Server X Protocol will listen on.>> "C:\APMServer\MySQL-8.4.5\my.ini"
-echo.%blank%>> "C:\APMServer\MySQL-8.4.5\my.ini"
 
 ::checks and install mysql service
 set MySQLserviceName=MySQL84
@@ -3085,23 +3072,18 @@ echo Configuring PhpMyAdmin... PLEASE WAIT
 rename "C:\APMServer\Apache24\htdocs\phpMyAdmin-5.2.2-all-languages" phpmyadmin > nul
 
 ::generates random char sequence to create blowfish
-set _RNDLength_2=32
-set _Alphanumeric_2=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
-set _Str_2=%_Alphanumeric_2%987654321
-:_LenLoop_2
-if not "%_Str_2:~18%"=="" set _Str_2=%_Str_2:~9%& set /A _Len_2+=9& goto :_LenLoop_2
-set _tmp_2=%_Str_2:~9,1%
-set /A _Len_2=_Len_2+_tmp_2
-set _count_2=0
-set _RndAlphaNum_2=
-:_Loop_2
-set /a _count_2+=1
-set _RND_2=%Random%
-set /A _RND_2=_RND_2%%%_Len_2%
-set _RndAlphaNum_2=!_RndAlphaNum_2!!_Alphanumeric_2:~%_RND_2%,1!
-if !_count_2! lss %_RNDLength_2% goto _Loop_2
+set alpha_numeric=ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789
+set count=0
+set random_string=
 
-set secret=!_RndAlphaNum_2!
+:blowfish_loop
+set /a count+=1
+set rnd=%random%
+set /a rnd=rnd%%62
+set random_string=%random_string%!alpha_numeric:~%rnd%,1!
+if %count% lss 32 goto blowfish_loop
+
+set secret=%random_string%
 
 ::configures file config.sample.inc.php
 echo ^<?php> "C:\APMServer\Apache24\htdocs\phpmyadmin\config.sample.inc.php"
@@ -3323,7 +3305,7 @@ echo oLink.Save >> %SCRIPT%
 cscript /nologo %SCRIPT%
 del %SCRIPT%
 
-::adds apachemonitos shortcut to auto initialized
+::adds apachemonitor shortcut to auto initialized
 xcopy /s /y "%USERPROFILE%\Desktop\ApacheMonitor.lnk" "%USERPROFILE%\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\"
 
 ::adds uninstall file
